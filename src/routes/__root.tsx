@@ -8,19 +8,21 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Cog } from "lucide-react";
 import DefaultCatchBoundary from "@/components/DefaultCatchBoundary";
-import { fetchUser } from "@/utils/fetchUser";
+import type { SessionUser } from "@/utils/session";
+import { getCurrentUserFn } from "@/utils/spotify";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
-	user: { email: string } | null;
+	user: SessionUser | null;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	beforeLoad: async () => {
-		const user = await fetchUser();
+		const user = await getCurrentUserFn();
 		return { user };
 	},
 	head: () => ({
@@ -82,18 +84,21 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<Link to="/posts" activeProps={{ className: "font-bold" }}>
 						Posts
 					</Link>
-					<div className="ml-auto">
+					<div className="ml-auto flex items-center">
 						{user ? (
 							<>
-								<span className="mr-2">{user.email}</span>
+								<span className="mr-2">{user.displayName}</span>
+								<Link to="/user/settings" className="mr-2">
+									<Cog />
+								</Link>
 								<Link to="/logout">Logout</Link>
 							</>
 						) : (
 							<Link to="/login">Login</Link>
 						)}
 					</div>
+					<hr />
 				</header>
-				<hr />
 				{children}
 				<TanStackDevtools
 					config={{

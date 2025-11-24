@@ -14,8 +14,12 @@ import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthSpotifyRouteImport } from './routes/auth/spotify'
+import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedPostsRouteRouteImport } from './routes/_authed/posts.route'
 import { Route as AuthedPostsIndexRouteImport } from './routes/_authed/posts.index'
+import { Route as AuthedChatsIndexRouteImport } from './routes/_authed/chats.index'
+import { Route as AuthedUserSettingsRouteImport } from './routes/_authed/user.settings'
 import { Route as AuthedPostsPostIdRouteImport } from './routes/_authed/posts.$postId'
 
 const SignupRoute = SignupRouteImport.update({
@@ -42,6 +46,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSpotifyRoute = AuthSpotifyRouteImport.update({
+  id: '/auth/spotify',
+  path: '/auth/spotify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedPostsRouteRoute = AuthedPostsRouteRouteImport.update({
   id: '/posts',
   path: '/posts',
@@ -51,6 +65,16 @@ const AuthedPostsIndexRoute = AuthedPostsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthedPostsRouteRoute,
+} as any)
+const AuthedChatsIndexRoute = AuthedChatsIndexRouteImport.update({
+  id: '/chats/',
+  path: '/chats/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedUserSettingsRoute = AuthedUserSettingsRouteImport.update({
+  id: '/user/settings',
+  path: '/user/settings',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedPostsPostIdRoute = AuthedPostsPostIdRouteImport.update({
   id: '/$postId',
@@ -64,7 +88,11 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
   '/posts': typeof AuthedPostsRouteRouteWithChildren
+  '/dashboard': typeof AuthedDashboardRoute
+  '/auth/spotify': typeof AuthSpotifyRoute
   '/posts/$postId': typeof AuthedPostsPostIdRoute
+  '/user/settings': typeof AuthedUserSettingsRoute
+  '/chats': typeof AuthedChatsIndexRoute
   '/posts/': typeof AuthedPostsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -72,7 +100,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/auth/spotify': typeof AuthSpotifyRoute
   '/posts/$postId': typeof AuthedPostsPostIdRoute
+  '/user/settings': typeof AuthedUserSettingsRoute
+  '/chats': typeof AuthedChatsIndexRoute
   '/posts': typeof AuthedPostsIndexRoute
 }
 export interface FileRoutesById {
@@ -83,7 +115,11 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
   '/_authed/posts': typeof AuthedPostsRouteRouteWithChildren
+  '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/auth/spotify': typeof AuthSpotifyRoute
   '/_authed/posts/$postId': typeof AuthedPostsPostIdRoute
+  '/_authed/user/settings': typeof AuthedUserSettingsRoute
+  '/_authed/chats/': typeof AuthedChatsIndexRoute
   '/_authed/posts/': typeof AuthedPostsIndexRoute
 }
 export interface FileRouteTypes {
@@ -94,10 +130,24 @@ export interface FileRouteTypes {
     | '/logout'
     | '/signup'
     | '/posts'
+    | '/dashboard'
+    | '/auth/spotify'
     | '/posts/$postId'
+    | '/user/settings'
+    | '/chats'
     | '/posts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/logout' | '/signup' | '/posts/$postId' | '/posts'
+  to:
+    | '/'
+    | '/login'
+    | '/logout'
+    | '/signup'
+    | '/dashboard'
+    | '/auth/spotify'
+    | '/posts/$postId'
+    | '/user/settings'
+    | '/chats'
+    | '/posts'
   id:
     | '__root__'
     | '/'
@@ -106,7 +156,11 @@ export interface FileRouteTypes {
     | '/logout'
     | '/signup'
     | '/_authed/posts'
+    | '/_authed/dashboard'
+    | '/auth/spotify'
     | '/_authed/posts/$postId'
+    | '/_authed/user/settings'
+    | '/_authed/chats/'
     | '/_authed/posts/'
   fileRoutesById: FileRoutesById
 }
@@ -116,6 +170,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   LogoutRoute: typeof LogoutRoute
   SignupRoute: typeof SignupRoute
+  AuthSpotifyRoute: typeof AuthSpotifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -155,6 +210,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/spotify': {
+      id: '/auth/spotify'
+      path: '/auth/spotify'
+      fullPath: '/auth/spotify'
+      preLoaderRoute: typeof AuthSpotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/posts': {
       id: '/_authed/posts'
       path: '/posts'
@@ -168,6 +237,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/posts/'
       preLoaderRoute: typeof AuthedPostsIndexRouteImport
       parentRoute: typeof AuthedPostsRouteRoute
+    }
+    '/_authed/chats/': {
+      id: '/_authed/chats/'
+      path: '/chats'
+      fullPath: '/chats'
+      preLoaderRoute: typeof AuthedChatsIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/user/settings': {
+      id: '/_authed/user/settings'
+      path: '/user/settings'
+      fullPath: '/user/settings'
+      preLoaderRoute: typeof AuthedUserSettingsRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/_authed/posts/$postId': {
       id: '/_authed/posts/$postId'
@@ -194,10 +277,16 @@ const AuthedPostsRouteRouteWithChildren =
 
 interface AuthedRouteChildren {
   AuthedPostsRouteRoute: typeof AuthedPostsRouteRouteWithChildren
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedUserSettingsRoute: typeof AuthedUserSettingsRoute
+  AuthedChatsIndexRoute: typeof AuthedChatsIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedPostsRouteRoute: AuthedPostsRouteRouteWithChildren,
+  AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedUserSettingsRoute: AuthedUserSettingsRoute,
+  AuthedChatsIndexRoute: AuthedChatsIndexRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -209,6 +298,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   LogoutRoute: LogoutRoute,
   SignupRoute: SignupRoute,
+  AuthSpotifyRoute: AuthSpotifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
