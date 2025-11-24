@@ -1,23 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import mongoose from "mongoose";
 import Login from "@/components/Login";
+import User from "@/lib/models/user";
 import { hashPassword } from "@/utils/password";
 import { useAppSession } from "@/utils/session";
 
 export const loginFn = createServerFn({ method: "POST" })
 	.inputValidator((d: { email: string; password: string }) => d)
 	.handler(async ({ data }) => {
-		// Find the user from db
-		const User = mongoose.model("User");
 		const user = await User.findOne({
 			email: data.email,
 		});
-
-		// Create a session
-		const session = await useAppSession();
-
-		// check if the user exists
 		if (!user) {
 			return {
 				error: true,
@@ -26,7 +19,6 @@ export const loginFn = createServerFn({ method: "POST" })
 			};
 		}
 
-		// check if the password matches
 		const hashedPassword = await hashPassword(data.password);
 		if (user.password !== hashedPassword) {
 			return {
@@ -35,8 +27,14 @@ export const loginFn = createServerFn({ method: "POST" })
 			};
 		}
 
+		// Create a session
+		// biome-ignore lint/correctness/useHookAtTopLevel: <naming>
+		const session = await useAppSession();
+
 		await session.update({
-			userEmail: user.email,
+			email: user.email,
+			id: user._id.toString(),
+			role: "user", // user.role,
 		});
 	});
 

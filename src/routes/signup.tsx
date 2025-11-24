@@ -36,7 +36,10 @@ export const signupFn = createServerFn({ method: "POST" })
 
 			// store the user's email in the session
 			await session.update({
-				userEmail: found.email,
+				email: found.email,
+				id: found.id,
+				// implement roles later
+				role: "user",
 			});
 
 			// redirect to the prev page stored in the redirect search param
@@ -54,7 +57,10 @@ export const signupFn = createServerFn({ method: "POST" })
 
 		// store the user's email in the session
 		await session.update({
-			userEmail: user.email,
+			email: user.email,
+			id: user.id,
+			// implement roles later
+			role: "user",
 		});
 
 		// redirect to the prev page stored in the redirect search param

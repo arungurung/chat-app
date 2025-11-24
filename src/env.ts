@@ -5,6 +5,7 @@ export const env = createEnv({
 	server: {
 		SERVER_URL: z.string().url().optional(),
 		MONGO_URI: z.string().min(1),
+		SESSION_SECRET: z.string().min(32),
 	},
 
 	/**
