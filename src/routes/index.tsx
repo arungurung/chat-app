@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import SpotifyIcon from "@/assets/spotify.svg?react";
-import { initiateSpotifyAuth } from "@/utils/spotify";
+import { initiateSpotifyAuth } from "@/utils/spotify-auth";
 
 type IndexSearch = {
 	error?: string;

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
-import { handleSpotifyCallback } from "@/utils/spotify";
+import { handleSpotifyCallback } from "@/utils/spotify-auth";
 
 type SpotifyCallbackSearch = {
 	code?: string;
