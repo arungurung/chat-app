@@ -11,7 +11,7 @@ export const getRouter = () => {
 
 	const router = createRouter({
 		routeTree,
-		context: { ...rqContext },
+		context: { ...rqContext, user: null },
 		defaultPreload: "intent",
 		Wrap: (props: { children: React.ReactNode }) => {
 			return (
@@ -33,3 +33,9 @@ export const getRouter = () => {
 
 	return router;
 };
+
+declare module "@tanstack/react-router" {
+	interface Register {
+		router: ReturnType<typeof getRouter>;
+	}
+}
