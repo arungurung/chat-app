@@ -15,7 +15,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSpotifyRouteImport } from './routes/auth/spotify'
 import { Route as AuthedDashboardRouteRouteImport } from './routes/_authed/dashboard.route'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard.index'
-import { Route as AuthedChatsIndexRouteImport } from './routes/_authed/chats.index'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -46,25 +45,18 @@ const AuthedDashboardIndexRoute = AuthedDashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedDashboardRouteRoute,
 } as any)
-const AuthedChatsIndexRoute = AuthedChatsIndexRouteImport.update({
-  id: '/chats/',
-  path: '/chats/',
-  getParentRoute: () => AuthedRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/logout': typeof LogoutRoute
   '/dashboard': typeof AuthedDashboardRouteRouteWithChildren
   '/auth/spotify': typeof AuthSpotifyRoute
-  '/chats': typeof AuthedChatsIndexRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/logout': typeof LogoutRoute
   '/auth/spotify': typeof AuthSpotifyRoute
-  '/chats': typeof AuthedChatsIndexRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -74,20 +66,13 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/_authed/dashboard': typeof AuthedDashboardRouteRouteWithChildren
   '/auth/spotify': typeof AuthSpotifyRoute
-  '/_authed/chats/': typeof AuthedChatsIndexRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/logout'
-    | '/dashboard'
-    | '/auth/spotify'
-    | '/chats'
-    | '/dashboard/'
+  fullPaths: '/' | '/logout' | '/dashboard' | '/auth/spotify' | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/logout' | '/auth/spotify' | '/chats' | '/dashboard'
+  to: '/' | '/logout' | '/auth/spotify' | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -95,7 +80,6 @@ export interface FileRouteTypes {
     | '/logout'
     | '/_authed/dashboard'
     | '/auth/spotify'
-    | '/_authed/chats/'
     | '/_authed/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -150,13 +134,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardIndexRouteImport
       parentRoute: typeof AuthedDashboardRouteRoute
     }
-    '/_authed/chats/': {
-      id: '/_authed/chats/'
-      path: '/chats'
-      fullPath: '/chats'
-      preLoaderRoute: typeof AuthedChatsIndexRouteImport
-      parentRoute: typeof AuthedRoute
-    }
   }
 }
 
@@ -173,12 +150,10 @@ const AuthedDashboardRouteRouteWithChildren =
 
 interface AuthedRouteChildren {
   AuthedDashboardRouteRoute: typeof AuthedDashboardRouteRouteWithChildren
-  AuthedChatsIndexRoute: typeof AuthedChatsIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedDashboardRouteRoute: AuthedDashboardRouteRouteWithChildren,
-  AuthedChatsIndexRoute: AuthedChatsIndexRoute,
 }
 
 const AuthedRouteWithChildren =

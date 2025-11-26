@@ -27,6 +27,8 @@ export const initiateSpotifyAuth = createServerFn({
 		"user-library-read",
 		"user-top-read",
 		"playlist-read-private",
+		"playlist-read-collaborative",
+		"user-read-recently-played",
 	];
 
 	const params = new URLSearchParams({
@@ -34,7 +36,8 @@ export const initiateSpotifyAuth = createServerFn({
 		response_type: "code",
 		redirect_uri: env.SPOTIFY_REDIRECT_URI,
 		scope: scopes.join(" "),
-		show_dialog: "false",
+		// Force consent screen so newly added scopes are granted
+		show_dialog: "true",
 	});
 
 	const authUrl = `https://accounts.spotify.com/authorize?${params.toString()}`;
