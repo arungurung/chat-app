@@ -105,3 +105,31 @@ export interface SpotifySearchResponse {
 
 // Time range for top items
 export type SpotifyTimeRange = "short_term" | "medium_term" | "long_term";
+
+// Audio features for tracks
+export interface SpotifyAudioFeatures {
+	id: string;
+	danceability: number;
+	energy: number;
+	key: number;
+	loudness: number;
+	mode: number;
+	speechiness: number;
+	acousticness: number;
+	instrumentalness: number;
+	liveness: number;
+	valence: number;
+	tempo: number;
+	duration_ms: number;
+	time_signature: number;
+}
+
+// Artist top tracks response
+export interface ArtistTopTracksResponse {
+	tracks: SpotifyTrack[];
+}
+
+// Related artists response
+export interface RelatedArtistsResponse {
+	artists: SpotifyArtist[];
+}

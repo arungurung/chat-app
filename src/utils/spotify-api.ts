@@ -1,8 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { tokenMiddleware } from "@/middlewares/token-middleware";
 import type {
+	ArtistTopTracksResponse,
+	RelatedArtistsResponse,
 	SpotifyAlbum,
 	SpotifyArtist,
+	SpotifyAudioFeatures,
 	SpotifyCategory,
 	SpotifyPaginatedResponse,
 	SpotifyPlaylist,
@@ -414,6 +417,70 @@ export const getPlaylistTracksFn = createServerFn({ method: "GET" })
 		});
 		return spotifyFetch<SpotifyPaginatedResponse<{ track: SpotifyTrack }>>(
 			`/playlists/${data.id}/tracks?${params}`,
+			accessToken,
+		);
+	});
+
+// Secondary data endpoints for enriched detail views
+export const getTrackAudioFeaturesFn = createServerFn({ method: "GET" })
+	.middleware([tokenMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<SpotifyAudioFeatures>(
+			`/audio-features/${data}`,
+			accessToken,
+		);
+	});
+
+export const getArtistTopTracksFn = createServerFn({ method: "GET" })
+	.middleware([tokenMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<ArtistTopTracksResponse>(
+			`/artists/${data}/top-tracks?market=US`,
+			accessToken,
+		);
+	});
+
+export const getRelatedArtistsFn = createServerFn({ method: "GET" })
+	.middleware([tokenMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<RelatedArtistsResponse>(
+			`/artists/${data}/related-artists`,
+			accessToken,
+		);
+	});
+
+export const getArtistAlbumsFn = createServerFn({ method: "GET" })
+	.middleware([tokenMiddleware])
+	.inputValidator((input: { id: string; limit?: number }) => ({
+		id: input.id,
+		limit: Math.min(input.limit ?? 10, 50),
+	}))
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		const params = new URLSearchParams({
+			limit: String(data.limit),
+			include_groups: "album,single",
+		});
+		return spotifyFetch<SpotifyPaginatedResponse<SpotifyAlbum>>(
+			`/artists/${data.id}/albums?${params}`,
 			accessToken,
 		);
 	});

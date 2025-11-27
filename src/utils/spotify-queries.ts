@@ -2,13 +2,17 @@ import { queryOptions } from "@tanstack/react-query";
 import type { SpotifyTimeRange } from "@/types/spotify";
 import {
 	getAlbumByIdFn,
+	getArtistAlbumsFn,
 	getArtistByIdFn,
+	getArtistTopTracksFn,
 	getPlaylistByIdFn,
 	getPlaylistTracksFn,
 	getRecentlyPlayed,
+	getRelatedArtistsFn,
 	getSavedAlbums,
 	getTopArtists,
 	getTopTracks,
+	getTrackAudioFeaturesFn,
 	getTrackByIdFn,
 	getUserPlaylists,
 } from "./spotify-api";
@@ -106,4 +110,33 @@ export const playlistTracksQueryOptions = (
 		queryKey: ["playlist-tracks", id, limit, offset],
 		queryFn: () => getPlaylistTracksFn({ data: { id, limit, offset } }),
 		staleTime: 1000 * 30,
+	});
+
+// Secondary data query options
+export const trackAudioFeaturesQueryOptions = (id: string) =>
+	queryOptions({
+		queryKey: ["track-audio-features", id],
+		queryFn: () => getTrackAudioFeaturesFn({ data: id }),
+		staleTime: 1000 * 60 * 60, // 1 hour - audio features don't change
+	});
+
+export const artistTopTracksQueryOptions = (id: string) =>
+	queryOptions({
+		queryKey: ["artist-top-tracks", id],
+		queryFn: () => getArtistTopTracksFn({ data: id }),
+		staleTime: 1000 * 60 * 30, // 30 minutes
+	});
+
+export const relatedArtistsQueryOptions = (id: string) =>
+	queryOptions({
+		queryKey: ["related-artists", id],
+		queryFn: () => getRelatedArtistsFn({ data: id }),
+		staleTime: 1000 * 60 * 60, // 1 hour
+	});
+
+export const artistAlbumsQueryOptions = (id: string, limit = 10) =>
+	queryOptions({
+		queryKey: ["artist-albums", id, limit],
+		queryFn: () => getArtistAlbumsFn({ data: { id, limit } }),
+		staleTime: 1000 * 60 * 30, // 30 minutes
 	});

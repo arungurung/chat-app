@@ -2,12 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useId, useRef, useState } from "react";
 import { Motion, useReducedMotion } from "@/components/motion/MotionProvider";
 import { useUIStore } from "@/components/motion/uiStore";
+import AnimatedMenu from "@/components/ui/AnimatedMenu";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import {
 	albumDetailQueryOptions,
+	artistAlbumsQueryOptions,
 	artistDetailQueryOptions,
+	artistTopTracksQueryOptions,
 	playlistDetailQueryOptions,
 	playlistTracksQueryOptions,
+	relatedArtistsQueryOptions,
+	trackAudioFeaturesQueryOptions,
 	trackDetailQueryOptions,
 } from "@/utils/spotify-queries";
 
@@ -128,6 +133,7 @@ export function EntityDetailPanel() {
 
 function TrackDetail({ id }: { id: string }) {
 	const { data, isLoading, error } = useQuery(trackDetailQueryOptions(id));
+	const audioFeatures = useQuery(trackAudioFeaturesQueryOptions(id));
 
 	useEffect(() => {
 		if (data) {
@@ -147,27 +153,113 @@ function TrackDetail({ id }: { id: string }) {
 	if (isLoading) return <div>Loading track…</div>;
 	if (error) return <div className="text-red-600">{String(error)}</div>;
 	if (!data) return null;
+
+	const copyLink = () => {
+		navigator.clipboard.writeText(data.external_urls.spotify);
+	};
+
+	const openInSpotify = () => {
+		window.open(data.external_urls.spotify, "_blank");
+	};
+
 	return (
 		<div>
-			<div className="mb-3 flex items-center gap-3">
-				{data.album?.images?.[0]?.url && (
-					<Motion.img
-						src={data.album.images[0].url}
-						alt={data.name}
-						layoutId={`track-${id}`}
-						className="aspect-square h-16 w-16 rounded-md object-cover"
-					/>
-				)}
-				<h3 className="text-lg font-semibold">{data.name}</h3>
+			<div className="mb-3 flex items-center justify-between gap-3">
+				<div className="flex items-center gap-3">
+					{data.album?.images?.[0]?.url && (
+						<Motion.img
+							src={data.album.images[0].url}
+							alt={data.name}
+							layoutId={`track-${id}`}
+							className="aspect-square h-16 w-16 rounded-md object-cover"
+						/>
+					)}
+					<h3 className="text-lg font-semibold">{data.name}</h3>
+				</div>
+				<AnimatedMenu
+					trigger={
+						<svg
+							className="h-5 w-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<title>More actions</title>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+							/>
+						</svg>
+					}
+					items={[
+						{ label: "Copy Link", onClick: copyLink },
+						{ label: "Open in Spotify", onClick: openInSpotify },
+					]}
+				/>
 			</div>
-			<p>Artist: {data.artists?.map((a) => a.name).join(", ")}</p>
-			<p>Album: {data.album?.name}</p>
+			<div className="space-y-2">
+				<p>
+					<span className="font-medium">Artist:</span>{" "}
+					{data.artists?.map((a) => a.name).join(", ")}
+				</p>
+				<p>
+					<span className="font-medium">Album:</span> {data.album?.name}
+				</p>
+				<p>
+					<span className="font-medium">Duration:</span>{" "}
+					{Math.floor(data.duration_ms / 60000)}:
+					{String(Math.floor((data.duration_ms % 60000) / 1000)).padStart(
+						2,
+						"0",
+					)}
+				</p>
+				<p>
+					<span className="font-medium">Popularity:</span> {data.popularity}/100
+				</p>
+			</div>
+
+			{audioFeatures.data && (
+				<div className="mt-4 rounded-lg bg-gray-50 p-3">
+					<h4 className="mb-2 font-semibold text-gray-900">Audio Features</h4>
+					<div className="grid grid-cols-2 gap-2 text-sm">
+						<div>
+							<span className="text-gray-600">Energy:</span>{" "}
+							{Math.round(audioFeatures.data.energy * 100)}%
+						</div>
+						<div>
+							<span className="text-gray-600">Danceability:</span>{" "}
+							{Math.round(audioFeatures.data.danceability * 100)}%
+						</div>
+						<div>
+							<span className="text-gray-600">Valence:</span>{" "}
+							{Math.round(audioFeatures.data.valence * 100)}%
+						</div>
+						<div>
+							<span className="text-gray-600">Tempo:</span>{" "}
+							{Math.round(audioFeatures.data.tempo)} BPM
+						</div>
+						<div>
+							<span className="text-gray-600">Acousticness:</span>{" "}
+							{Math.round(audioFeatures.data.acousticness * 100)}%
+						</div>
+						<div>
+							<span className="text-gray-600">Instrumentalness:</span>{" "}
+							{Math.round(audioFeatures.data.instrumentalness * 100)}%
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
 
 function ArtistDetail({ id }: { id: string }) {
 	const { data, isLoading, error } = useQuery(artistDetailQueryOptions(id));
+	const topTracks = useQuery(artistTopTracksQueryOptions(id));
+	const related = useQuery(relatedArtistsQueryOptions(id));
+	const albums = useQuery(artistAlbumsQueryOptions(id, 6));
 
 	useEffect(() => {
 		if (data) {
@@ -187,21 +279,142 @@ function ArtistDetail({ id }: { id: string }) {
 	if (isLoading) return <div>Loading artist…</div>;
 	if (error) return <div className="text-red-600">{String(error)}</div>;
 	if (!data) return null;
+
+	const copyLink = () => {
+		navigator.clipboard.writeText(data.external_urls.spotify);
+	};
+
+	const openInSpotify = () => {
+		window.open(data.external_urls.spotify, "_blank");
+	};
+
 	return (
 		<div>
-			<div className="mb-3 flex items-center gap-3">
-				{data.images?.[0]?.url && (
-					<Motion.img
-						src={data.images[0].url}
-						alt={data.name}
-						layoutId={`artist-${id}`}
-						className="aspect-square h-16 w-16 rounded-full object-cover"
-					/>
-				)}
-				<h3 className="text-lg font-semibold">{data.name}</h3>
+			<div className="mb-3 flex items-center justify-between gap-3">
+				<div className="flex items-center gap-3">
+					{data.images?.[0]?.url && (
+						<Motion.img
+							src={data.images[0].url}
+							alt={data.name}
+							layoutId={`artist-${id}`}
+							className="aspect-square h-16 w-16 rounded-full object-cover"
+						/>
+					)}
+					<h3 className="text-lg font-semibold">{data.name}</h3>
+				</div>
+				<AnimatedMenu
+					trigger={
+						<svg
+							className="h-5 w-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<title>More actions</title>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+							/>
+						</svg>
+					}
+					items={[
+						{ label: "Copy Link", onClick: copyLink },
+						{ label: "Open in Spotify", onClick: openInSpotify },
+					]}
+				/>
 			</div>
-			<p>Followers: {data.followers?.total?.toLocaleString?.()}</p>
-			<p>Genres: {(data.genres || []).slice(0, 5).join(", ")}</p>
+			<div className="space-y-2">
+				<p>
+					<span className="font-medium">Followers:</span>{" "}
+					{data.followers?.total?.toLocaleString?.()}
+				</p>
+				<p>
+					<span className="font-medium">Genres:</span>{" "}
+					{(data.genres || []).slice(0, 5).join(", ")}
+				</p>
+				{data.popularity !== undefined && (
+					<p>
+						<span className="font-medium">Popularity:</span> {data.popularity}
+						/100
+					</p>
+				)}
+			</div>
+
+			{topTracks.data?.tracks && topTracks.data.tracks.length > 0 && (
+				<div className="mt-4">
+					<h4 className="mb-2 font-semibold text-gray-900">Top Tracks</h4>
+					<div className="space-y-1">
+						{topTracks.data.tracks.slice(0, 5).map((track) => (
+							<button
+								key={track.id}
+								type="button"
+								onClick={() =>
+									window.open(track.external_urls.spotify, "_blank")
+								}
+								className="flex w-full items-center gap-2 rounded px-2 py-1 text-left text-sm hover:bg-gray-100"
+							>
+								{track.album?.images?.[0]?.url && (
+									<img
+										src={track.album.images[0].url}
+										alt={track.name}
+										className="h-8 w-8 rounded object-cover"
+									/>
+								)}
+								<span className="flex-1 truncate">{track.name}</span>
+							</button>
+						))}
+					</div>
+				</div>
+			)}
+
+			{albums.data?.items && albums.data.items.length > 0 && (
+				<div className="mt-4">
+					<h4 className="mb-2 font-semibold text-gray-900">Recent Albums</h4>
+					<div className="grid grid-cols-3 gap-2">
+						{albums.data.items.slice(0, 6).map((album) => (
+							<button
+								key={album.id}
+								type="button"
+								onClick={() =>
+									window.open(album.external_urls.spotify, "_blank")
+								}
+								className="group overflow-hidden rounded-md"
+								title={album.name}
+							>
+								{album.images?.[0]?.url && (
+									<img
+										src={album.images[0].url}
+										alt={album.name}
+										className="aspect-square w-full object-cover transition-transform group-hover:scale-105"
+									/>
+								)}
+							</button>
+						))}
+					</div>
+				</div>
+			)}
+
+			{related.data?.artists && related.data.artists.length > 0 && (
+				<div className="mt-4 rounded-lg bg-gray-50 p-3">
+					<h4 className="mb-2 font-semibold text-gray-900">Related Artists</h4>
+					<div className="flex flex-wrap gap-2">
+						{related.data.artists.slice(0, 8).map((artist) => (
+							<button
+								key={artist.id}
+								type="button"
+								onClick={() =>
+									window.open(artist.external_urls.spotify, "_blank")
+								}
+								className="rounded-full bg-white px-3 py-1 text-sm text-gray-700 shadow-sm hover:bg-gray-100"
+							>
+								{artist.name}
+							</button>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
@@ -227,21 +440,68 @@ function AlbumDetail({ id }: { id: string }) {
 	if (isLoading) return <div>Loading album…</div>;
 	if (error) return <div className="text-red-600">{String(error)}</div>;
 	if (!data) return null;
+
+	const copyLink = () => {
+		navigator.clipboard.writeText(data.external_urls.spotify);
+	};
+
+	const openInSpotify = () => {
+		window.open(data.external_urls.spotify, "_blank");
+	};
+
 	return (
 		<div>
-			<div className="mb-3 flex items-center gap-3">
-				{data.images?.[0]?.url && (
-					<Motion.img
-						src={data.images[0].url}
-						alt={data.name}
-						layoutId={`album-${id}`}
-						className="aspect-square h-16 w-16 rounded-md object-cover"
-					/>
-				)}
-				<h3 className="text-lg font-semibold">{data.name}</h3>
+			<div className="mb-3 flex items-center justify-between gap-3">
+				<div className="flex items-center gap-3">
+					{data.images?.[0]?.url && (
+						<Motion.img
+							src={data.images[0].url}
+							alt={data.name}
+							layoutId={`album-${id}`}
+							className="aspect-square h-16 w-16 rounded-md object-cover"
+						/>
+					)}
+					<h3 className="text-lg font-semibold">{data.name}</h3>
+				</div>
+				<AnimatedMenu
+					trigger={
+						<svg
+							className="h-5 w-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<title>More actions</title>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+							/>
+						</svg>
+					}
+					items={[
+						{ label: "Copy Link", onClick: copyLink },
+						{ label: "Open in Spotify", onClick: openInSpotify },
+					]}
+				/>
 			</div>
-			<p>By: {data.artists?.map((a) => a.name).join(", ")}</p>
-			{/* Track count omitted to match type definitions */}
+			<div className="space-y-2">
+				<p>
+					<span className="font-medium">Artist:</span>{" "}
+					{data.artists?.map((a) => a.name).join(", ")}
+				</p>
+				<p>
+					<span className="font-medium">Release Date:</span> {data.release_date}
+				</p>
+				<p>
+					<span className="font-medium">Total Tracks:</span> {data.total_tracks}
+				</p>
+				<p>
+					<span className="font-medium">Type:</span>{" "}
+					{data.album_type.charAt(0).toUpperCase() + data.album_type.slice(1)}
+				</p>
+			</div>
 		</div>
 	);
 }
@@ -310,20 +570,55 @@ function PlaylistDetail({
 
 	const hasMore = allTracks.length < (detail.data.tracks?.total || 0);
 
+	const copyLink = () => {
+		navigator.clipboard.writeText(detail.data.external_urls.spotify);
+	};
+
+	const openInSpotify = () => {
+		window.open(detail.data.external_urls.spotify, "_blank");
+	};
+
 	return (
 		<div>
-			<div className="mb-3 flex items-center gap-3">
-				{detail.data.images?.[0]?.url && (
-					<Motion.img
-						src={detail.data.images[0].url}
-						alt={detail.data.name}
-						layoutId={`playlist-${id}`}
-						className="aspect-square h-16 w-16 rounded-md object-cover"
-					/>
-				)}
-				<h3 className="text-lg font-semibold">{detail.data.name}</h3>
+			<div className="mb-3 flex items-center justify-between gap-3">
+				<div className="flex items-center gap-3">
+					{detail.data.images?.[0]?.url && (
+						<Motion.img
+							src={detail.data.images[0].url}
+							alt={detail.data.name}
+							layoutId={`playlist-${id}`}
+							className="aspect-square h-16 w-16 rounded-md object-cover"
+						/>
+					)}
+					<h3 className="text-lg font-semibold">{detail.data.name}</h3>
+				</div>
+				<AnimatedMenu
+					trigger={
+						<svg
+							className="h-5 w-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<title>More actions</title>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+							/>
+						</svg>
+					}
+					items={[
+						{ label: "Copy Link", onClick: copyLink },
+						{ label: "Open in Spotify", onClick: openInSpotify },
+					]}
+				/>
 			</div>
-			<p>Tracks: {detail.data.tracks?.total}</p>
+			<p>
+				<span className="font-medium">Total Tracks:</span>{" "}
+				{detail.data.tracks?.total}
+			</p>
 			<div ref={listRef} className="mt-3 space-y-2">
 				{allTracks.map((it, idx) => (
 					<button
