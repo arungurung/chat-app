@@ -1,6 +1,5 @@
 import { defineConfig } from "vitest/config";
-import { fileURLToPath } from "node:url";
-import { URL } from "node:url";
+import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
 	resolve: {
@@ -9,7 +8,8 @@ export default defineConfig({
 		},
 	},
 	test: {
+		globals: true,
 		environment: "jsdom",
-		setupFiles: ["src/test/setup.ts"],
+		setupFiles: ["./src/test/setup.ts"],
 	},
 });

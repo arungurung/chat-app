@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUIStore } from "@/components/motion/uiStore";
 import { AlbumCard } from "@/components/spotify/AlbumCard";
+import { AlbumListItem } from "@/components/spotify/AlbumListItem";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { SkeletonGrid } from "@/components/ui/LoadingSkeleton";
 import { savedAlbumsQueryOptions } from "@/utils/spotify-queries";
-import { LoadingGrid } from "./LoadingGrid";
 
 export function SavedAlbumsSection() {
 	const { data, isLoading, error, refetch } = useQuery(
@@ -14,7 +16,7 @@ export function SavedAlbumsSection() {
 		return (
 			<section>
 				<h2 className="mb-4 text-2xl font-bold text-gray-800">Saved Albums</h2>
-				<LoadingGrid columns="reduced" />
+				<SkeletonGrid count={8} />
 			</section>
 		);
 	}
@@ -55,15 +57,33 @@ export function SavedAlbumsSection() {
 	return (
 		<section>
 			<h2 className="mb-4 text-2xl font-bold text-gray-800">Saved Albums</h2>
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+			{/* List view for small screens */}
+			<div className="flex flex-col gap-2 md:hidden">
 				{data.items
 					.filter((item) => item.album !== undefined)
 					.map((item) => (
-						<AlbumCard
+						<AlbumListItem
 							key={item.album?.id}
 							album={item.album as import("@/types/spotify").SpotifyAlbum}
-							onClick={(a) => openPanel("album", a.id)}
+							onClick={() => openPanel("album", item.album?.id as string)}
 						/>
+					))}
+			</div>
+			{/* Grid view for medium+ screens */}
+			<div className="hidden grid-cols-3 gap-3 md:grid lg:grid-cols-4 xl:grid-cols-6">
+				{data.items
+					.filter((item) => item.album !== undefined)
+					.map((item, index) => (
+						<AnimatedCard
+							key={item.album?.id}
+							index={index}
+							layoutId={`album-${item.album?.id}`}
+							onClick={() => openPanel("album", item.album?.id as string)}
+						>
+							<AlbumCard
+								album={item.album as import("@/types/spotify").SpotifyAlbum}
+							/>
+						</AnimatedCard>
 					))}
 			</div>
 		</section>

@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUIStore } from "@/components/motion/uiStore";
 import TrackCard from "@/components/spotify/TrackCard";
+import { TrackListItem } from "@/components/spotify/TrackListItem";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { SkeletonGrid } from "@/components/ui/LoadingSkeleton";
 import type { SpotifyTimeRange } from "@/types/spotify";
 import { topTracksQueryOptions } from "@/utils/spotify-queries";
-import { LoadingGrid } from "./LoadingGrid";
 
 export function TopTracksSection({
 	timeRange,
@@ -21,7 +23,7 @@ export function TopTracksSection({
 				<h2 className="mb-4 text-2xl font-bold text-gray-800">
 					Your Top Tracks
 				</h2>
-				<LoadingGrid />
+				<SkeletonGrid count={10} />
 			</section>
 		);
 	}
@@ -64,13 +66,27 @@ export function TopTracksSection({
 	return (
 		<section>
 			<h2 className="mb-4 text-2xl font-bold text-gray-800">Your Top Tracks</h2>
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+			{/* List view for small screens */}
+			<div className="flex flex-col gap-2 md:hidden">
 				{data.items.map((track) => (
-					<TrackCard
+					<TrackListItem
 						key={track.id}
 						track={track}
-						onClick={(t) => openPanel("track", t.id)}
+						onClick={() => openPanel("track", track.id)}
 					/>
+				))}
+			</div>
+			{/* Grid view for medium+ screens */}
+			<div className="hidden grid-cols-3 gap-3 md:grid lg:grid-cols-4 xl:grid-cols-6">
+				{data.items.map((track, index) => (
+					<AnimatedCard
+						key={track.id}
+						index={index}
+						layoutId={`track-${track.id}`}
+						onClick={() => openPanel("track", track.id)}
+					>
+						<TrackCard track={track} />
+					</AnimatedCard>
 				))}
 			</div>
 		</section>

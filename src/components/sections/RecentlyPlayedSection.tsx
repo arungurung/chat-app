@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUIStore } from "@/components/motion/uiStore";
 import TrackCard from "@/components/spotify/TrackCard";
+import { TrackListItem } from "@/components/spotify/TrackListItem";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { SkeletonGrid } from "@/components/ui/LoadingSkeleton";
 import { recentlyPlayedQueryOptions } from "@/utils/spotify-queries";
-import { LoadingGrid } from "./LoadingGrid";
 
 export function RecentlyPlayedSection() {
 	const { data, isLoading, error, refetch } = useQuery(
@@ -16,7 +18,7 @@ export function RecentlyPlayedSection() {
 				<h2 className="mb-4 text-2xl font-bold text-gray-800">
 					Recently Played
 				</h2>
-				<LoadingGrid />
+				<SkeletonGrid count={10} />
 			</section>
 		);
 	}
@@ -59,13 +61,27 @@ export function RecentlyPlayedSection() {
 	return (
 		<section>
 			<h2 className="mb-4 text-2xl font-bold text-gray-800">Recently Played</h2>
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+			{/* List view for small screens */}
+			<div className="flex flex-col gap-2 md:hidden">
 				{data.items.map((item, index) => (
-					<TrackCard
+					<TrackListItem
 						key={`${item.track.id}-${index}`}
 						track={item.track}
-						onClick={(t) => openPanel("track", t.id)}
+						onClick={() => openPanel("track", item.track.id)}
 					/>
+				))}
+			</div>
+			{/* Grid view for medium+ screens */}
+			<div className="hidden grid-cols-3 gap-3 md:grid lg:grid-cols-4 xl:grid-cols-6">
+				{data.items.map((item, index) => (
+					<AnimatedCard
+						key={`${item.track.id}-${index}`}
+						index={index}
+						layoutId={`recent-${item.track.id}`}
+						onClick={() => openPanel("track", item.track.id)}
+					>
+						<TrackCard track={item.track} />
+					</AnimatedCard>
 				))}
 			</div>
 		</section>

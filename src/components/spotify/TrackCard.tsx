@@ -12,20 +12,30 @@ const TrackCard = ({ track, onClick }: TrackCardProps) => {
 	return (
 		<button
 			type="button"
-			className="group cursor-pointer rounded-lg bg-white p-4 shadow transition-all hover:shadow-lg"
+			className="group flex h-full cursor-pointer flex-col rounded-lg bg-white p-2 shadow transition-all hover:shadow-lg"
 			onClick={() => onClick?.(track)}
 		>
 			{albumImage && (
 				<img
 					src={albumImage}
 					alt={track.name}
-					className="mb-3 aspect-square w-full rounded-md object-cover"
+					className="mb-2 aspect-square w-full rounded-md object-cover"
 				/>
 			)}
-			<h3 className="truncate font-semibold text-gray-900">{track.name}</h3>
-			<p className="truncate text-sm text-gray-600">{artists}</p>
+			<h3
+				className="text-sm font-semibold text-gray-900 leading-tight line-clamp-1 mb-2"
+				title={track.name}
+			>
+				{track.name}
+			</h3>
+			<p
+				className="text-xs text-gray-600 leading-tight line-clamp-1"
+				title={artists}
+			>
+				{artists}
+			</p>
 			{track.preview_url && (
-				<div className="mt-2 text-xs text-green-600">Preview available</div>
+				<div className="mt-1 text-[10px] text-green-600">Preview available</div>
 			)}
 		</button>
 	);

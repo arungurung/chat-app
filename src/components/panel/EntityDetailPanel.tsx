@@ -113,7 +113,17 @@ function TrackDetail({ id }: { id: string }) {
 	if (!data) return null;
 	return (
 		<div>
-			<h3 className="text-lg font-semibold">{data.name}</h3>
+			<div className="mb-3 flex items-center gap-3">
+				{data.album?.images?.[0]?.url && (
+					<Motion.img
+						src={data.album.images[0].url}
+						alt={data.name}
+						layoutId={`track-${id}`}
+						className="aspect-square h-16 w-16 rounded-md object-cover"
+					/>
+				)}
+				<h3 className="text-lg font-semibold">{data.name}</h3>
+			</div>
 			<p>Artist: {data.artists?.map((a) => a.name).join(", ")}</p>
 			<p>Album: {data.album?.name}</p>
 		</div>
@@ -127,7 +137,17 @@ function ArtistDetail({ id }: { id: string }) {
 	if (!data) return null;
 	return (
 		<div>
-			<h3 className="text-lg font-semibold">{data.name}</h3>
+			<div className="mb-3 flex items-center gap-3">
+				{data.images?.[0]?.url && (
+					<Motion.img
+						src={data.images[0].url}
+						alt={data.name}
+						layoutId={`artist-${id}`}
+						className="aspect-square h-16 w-16 rounded-full object-cover"
+					/>
+				)}
+				<h3 className="text-lg font-semibold">{data.name}</h3>
+			</div>
 			<p>Followers: {data.followers?.total?.toLocaleString?.()}</p>
 			<p>Genres: {(data.genres || []).slice(0, 5).join(", ")}</p>
 		</div>
@@ -141,7 +161,17 @@ function AlbumDetail({ id }: { id: string }) {
 	if (!data) return null;
 	return (
 		<div>
-			<h3 className="text-lg font-semibold">{data.name}</h3>
+			<div className="mb-3 flex items-center gap-3">
+				{data.images?.[0]?.url && (
+					<Motion.img
+						src={data.images[0].url}
+						alt={data.name}
+						layoutId={`album-${id}`}
+						className="aspect-square h-16 w-16 rounded-md object-cover"
+					/>
+				)}
+				<h3 className="text-lg font-semibold">{data.name}</h3>
+			</div>
 			<p>By: {data.artists?.map((a) => a.name).join(", ")}</p>
 			{/* Track count omitted to match type definitions */}
 		</div>
@@ -199,7 +229,17 @@ function PlaylistDetail({
 
 	return (
 		<div>
-			<h3 className="text-lg font-semibold">{detail.data.name}</h3>
+			<div className="mb-3 flex items-center gap-3">
+				{detail.data.images?.[0]?.url && (
+					<Motion.img
+						src={detail.data.images[0].url}
+						alt={detail.data.name}
+						layoutId={`playlist-${id}`}
+						className="aspect-square h-16 w-16 rounded-md object-cover"
+					/>
+				)}
+				<h3 className="text-lg font-semibold">{detail.data.name}</h3>
+			</div>
 			<p>Tracks: {detail.data.tracks?.total}</p>
 			<div ref={listRef} className="mt-3 space-y-2">
 				{allTracks.map((it, idx) => (
