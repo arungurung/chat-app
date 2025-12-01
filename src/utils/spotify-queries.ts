@@ -5,16 +5,16 @@ import {
 	getArtistAlbumsFn,
 	getArtistByIdFn,
 	getArtistTopTracksFn,
+	getCurrentUserProfileFn,
 	getPlaylistByIdFn,
 	getPlaylistTracksFn,
 	getRecentlyPlayed,
-	getRelatedArtistsFn,
 	getSavedAlbums,
 	getTopArtists,
 	getTopTracks,
-	getTrackAudioFeaturesFn,
 	getTrackByIdFn,
 	getUserPlaylists,
+	searchSpotify,
 } from "./spotify-api";
 
 export const topTracksQueryOptions = (
@@ -87,11 +87,12 @@ export const artistDetailQueryOptions = (id: string) =>
 		staleTime: 1000 * 60 * 30,
 	});
 
-export const albumDetailQueryOptions = (id: string) =>
+export const albumDetailQueryOptions = (id?: string) =>
 	queryOptions({
 		queryKey: ["album-detail", id],
-		queryFn: () => getAlbumByIdFn({ data: id }),
+		queryFn: () => getAlbumByIdFn({ data: id || "" }),
 		staleTime: 1000 * 60 * 30,
+		enabled: !!id,
 	});
 
 export const playlistDetailQueryOptions = (id: string) =>
@@ -113,12 +114,6 @@ export const playlistTracksQueryOptions = (
 	});
 
 // Secondary data query options
-export const trackAudioFeaturesQueryOptions = (id: string) =>
-	queryOptions({
-		queryKey: ["track-audio-features", id],
-		queryFn: () => getTrackAudioFeaturesFn({ data: id }),
-		staleTime: 1000 * 60 * 60, // 1 hour - audio features don't change
-	});
 
 export const artistTopTracksQueryOptions = (id: string) =>
 	queryOptions({
@@ -127,16 +122,28 @@ export const artistTopTracksQueryOptions = (id: string) =>
 		staleTime: 1000 * 60 * 30, // 30 minutes
 	});
 
-export const relatedArtistsQueryOptions = (id: string) =>
-	queryOptions({
-		queryKey: ["related-artists", id],
-		queryFn: () => getRelatedArtistsFn({ data: id }),
-		staleTime: 1000 * 60 * 60, // 1 hour
-	});
-
 export const artistAlbumsQueryOptions = (id: string, limit = 10) =>
 	queryOptions({
 		queryKey: ["artist-albums", id, limit],
 		queryFn: () => getArtistAlbumsFn({ data: { id, limit } }),
 		staleTime: 1000 * 60 * 30, // 30 minutes
+	});
+
+export const searchQueryOptions = (
+	query: string,
+	types = ["track", "artist", "album", "playlist"] as const,
+	limit = 20,
+) =>
+	queryOptions({
+		queryKey: ["search", query, types.join(","), limit],
+		queryFn: () =>
+			searchSpotify({ data: { query, types: Array.from(types), limit } }),
+		staleTime: 0,
+	});
+
+export const currentUserProfileQueryOptions = () =>
+	queryOptions({
+		queryKey: ["current-user-profile"],
+		queryFn: () => getCurrentUserProfileFn(),
+		staleTime: 1000 * 60 * 10,
 	});

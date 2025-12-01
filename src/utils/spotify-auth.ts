@@ -148,10 +148,12 @@ export const refreshSpotifyToken = createServerFn({
 export const getCurrentUserFn = createServerFn({
 	method: "GET",
 }).handler(async () => {
+	console.info("[auth] getCurrentUserFn invoked");
 	const session = await getAppSession();
 	const sessionData = session.data;
 
 	if (!sessionData.spotifyId || !sessionData.accessToken) {
+		console.info("[auth] No user in session");
 		return null;
 	}
 
@@ -181,7 +183,7 @@ export const getCurrentUserFn = createServerFn({
 				expiresAt: newExpiresAt,
 			};
 		} catch (error) {
-			console.error("Failed to refresh access token:", error);
+			console.error("[auth] Failed to refresh access token:", error);
 			await session.clear();
 			return null;
 		}

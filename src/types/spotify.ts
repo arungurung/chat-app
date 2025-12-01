@@ -30,6 +30,7 @@ export interface SpotifyAlbum {
 	images: SpotifyImage[];
 	release_date: string;
 	total_tracks: number;
+	tracks: SpotifyPaginatedResponse<SpotifyTrack>;
 	external_urls: {
 		spotify: string;
 	};
@@ -130,6 +131,15 @@ export interface ArtistTopTracksResponse {
 }
 
 // Related artists response
-export interface RelatedArtistsResponse {
-	artists: SpotifyArtist[];
+
+// Current user profile
+export interface SpotifyCurrentUserProfile {
+	id: string;
+	display_name: string | null;
+	email?: string;
+	images?: SpotifyImage[];
+	country?: string;
+	product?: "free" | "premium" | string; // free, premium, etc.
+	followers?: { total: number };
+	external_urls?: { spotify: string };
 }

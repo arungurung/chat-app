@@ -11,8 +11,6 @@ import {
 	artistTopTracksQueryOptions,
 	playlistDetailQueryOptions,
 	playlistTracksQueryOptions,
-	relatedArtistsQueryOptions,
-	trackAudioFeaturesQueryOptions,
 	trackDetailQueryOptions,
 } from "@/utils/spotify-queries";
 
@@ -133,7 +131,6 @@ export function EntityDetailPanel() {
 
 function TrackDetail({ id }: { id: string }) {
 	const { data, isLoading, error } = useQuery(trackDetailQueryOptions(id));
-	const audioFeatures = useQuery(trackAudioFeaturesQueryOptions(id));
 
 	useEffect(() => {
 		if (data) {
@@ -219,38 +216,6 @@ function TrackDetail({ id }: { id: string }) {
 					<span className="font-medium">Popularity:</span> {data.popularity}/100
 				</p>
 			</div>
-
-			{audioFeatures.data && (
-				<div className="mt-4 rounded-lg bg-gray-50 p-3">
-					<h4 className="mb-2 font-semibold text-gray-900">Audio Features</h4>
-					<div className="grid grid-cols-2 gap-2 text-sm">
-						<div>
-							<span className="text-gray-600">Energy:</span>{" "}
-							{Math.round(audioFeatures.data.energy * 100)}%
-						</div>
-						<div>
-							<span className="text-gray-600">Danceability:</span>{" "}
-							{Math.round(audioFeatures.data.danceability * 100)}%
-						</div>
-						<div>
-							<span className="text-gray-600">Valence:</span>{" "}
-							{Math.round(audioFeatures.data.valence * 100)}%
-						</div>
-						<div>
-							<span className="text-gray-600">Tempo:</span>{" "}
-							{Math.round(audioFeatures.data.tempo)} BPM
-						</div>
-						<div>
-							<span className="text-gray-600">Acousticness:</span>{" "}
-							{Math.round(audioFeatures.data.acousticness * 100)}%
-						</div>
-						<div>
-							<span className="text-gray-600">Instrumentalness:</span>{" "}
-							{Math.round(audioFeatures.data.instrumentalness * 100)}%
-						</div>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }
@@ -258,7 +223,6 @@ function TrackDetail({ id }: { id: string }) {
 function ArtistDetail({ id }: { id: string }) {
 	const { data, isLoading, error } = useQuery(artistDetailQueryOptions(id));
 	const topTracks = useQuery(artistTopTracksQueryOptions(id));
-	const related = useQuery(relatedArtistsQueryOptions(id));
 	const albums = useQuery(artistAlbumsQueryOptions(id, 6));
 
 	useEffect(() => {
@@ -396,25 +360,7 @@ function ArtistDetail({ id }: { id: string }) {
 				</div>
 			)}
 
-			{related.data?.artists && related.data.artists.length > 0 && (
-				<div className="mt-4 rounded-lg bg-gray-50 p-3">
-					<h4 className="mb-2 font-semibold text-gray-900">Related Artists</h4>
-					<div className="flex flex-wrap gap-2">
-						{related.data.artists.slice(0, 8).map((artist) => (
-							<button
-								key={artist.id}
-								type="button"
-								onClick={() =>
-									window.open(artist.external_urls.spotify, "_blank")
-								}
-								className="rounded-full bg-white px-3 py-1 text-sm text-gray-700 shadow-sm hover:bg-gray-100"
-							>
-								{artist.name}
-							</button>
-						))}
-					</div>
-				</div>
-			)}
+			{/* Related artists removed */}
 		</div>
 	);
 }
