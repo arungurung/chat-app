@@ -1,12 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
+import { useUIStore } from "@/components/motion/uiStore";
 import { PlaylistCard } from "@/components/spotify/PlaylistCard";
-import { userPlaylistsQueryOptions } from "@/utils/spotify-queries";
-import { LoadingGrid } from "./LoadingGrid";
+import { PlaylistListItem } from "@/components/spotify/PlaylistListItem";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { SkeletonGrid } from "@/components/ui/LoadingSkeleton";
+import { usePrefetch } from "@/hooks/usePrefetch";
+import {
+	playlistDetailQueryOptions,
+	userPlaylistsQueryOptions,
+} from "@/utils/spotify-queries";
 
 export function PlaylistsSection() {
 	const { data, isLoading, error, refetch } = useQuery(
 		userPlaylistsQueryOptions(),
 	);
+	const { openPanel } = useUIStore();
+	const { prefetch, cancel } = usePrefetch();
 
 	if (isLoading) {
 		return (
@@ -14,7 +23,7 @@ export function PlaylistsSection() {
 				<h2 className="mb-4 text-2xl font-bold text-gray-800">
 					Your Playlists
 				</h2>
-				<LoadingGrid columns="reduced" />
+				<SkeletonGrid count={8} />
 			</section>
 		);
 	}
@@ -59,15 +68,32 @@ export function PlaylistsSection() {
 	return (
 		<section>
 			<h2 className="mb-4 text-2xl font-bold text-gray-800">Your Playlists</h2>
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+			{/* List view for small screens */}
+			<div className="flex flex-col gap-2 md:hidden">
 				{data.items.map((playlist) => (
-					<PlaylistCard
+					<PlaylistListItem
 						key={playlist.id}
 						playlist={playlist}
-						onClick={(playlist) =>
-							window.open(playlist.external_urls.spotify, "_blank")
-						}
+						onClick={() => openPanel("playlist", playlist.id)}
 					/>
+				))}
+			</div>
+			{/* Grid view for medium+ screens */}
+			<div className="hidden grid-cols-3 gap-3 md:grid lg:grid-cols-4 xl:grid-cols-6">
+				{data.items.map((playlist, index) => (
+					<AnimatedCard
+						key={playlist.id}
+						index={index}
+						layoutId={`playlist-${playlist.id}`}
+						onClick={() => {
+							performance.mark(`detail-open-${playlist.id}`);
+							openPanel("playlist", playlist.id);
+						}}
+						onPrefetch={() => prefetch(playlistDetailQueryOptions(playlist.id))}
+						onCancelPrefetch={cancel}
+					>
+						<PlaylistCard playlist={playlist} />
+					</AnimatedCard>
 				))}
 			</div>
 		</section>

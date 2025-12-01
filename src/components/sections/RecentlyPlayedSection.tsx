@@ -1,12 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
+import { useUIStore } from "@/components/motion/uiStore";
 import TrackCard from "@/components/spotify/TrackCard";
-import { recentlyPlayedQueryOptions } from "@/utils/spotify-queries";
-import { LoadingGrid } from "./LoadingGrid";
+import { TrackListItem } from "@/components/spotify/TrackListItem";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { SkeletonGrid } from "@/components/ui/LoadingSkeleton";
+import { usePrefetch } from "@/hooks/usePrefetch";
+import {
+	recentlyPlayedQueryOptions,
+	trackDetailQueryOptions,
+} from "@/utils/spotify-queries";
 
 export function RecentlyPlayedSection() {
 	const { data, isLoading, error, refetch } = useQuery(
 		recentlyPlayedQueryOptions(),
 	);
+	const { openPanel } = useUIStore();
+	const { prefetch, cancel } = usePrefetch();
 
 	if (isLoading) {
 		return (
@@ -14,7 +23,7 @@ export function RecentlyPlayedSection() {
 				<h2 className="mb-4 text-2xl font-bold text-gray-800">
 					Recently Played
 				</h2>
-				<LoadingGrid />
+				<SkeletonGrid count={10} />
 			</section>
 		);
 	}
@@ -57,15 +66,32 @@ export function RecentlyPlayedSection() {
 	return (
 		<section>
 			<h2 className="mb-4 text-2xl font-bold text-gray-800">Recently Played</h2>
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+			{/* List view for small screens */}
+			<div className="flex flex-col gap-2 md:hidden">
 				{data.items.map((item, index) => (
-					<TrackCard
-						key={`${item.track.id}-${item.played_at}-${index}`}
+					<TrackListItem
+						key={`${item.track.id}-${index}`}
 						track={item.track}
-						onClick={(track) =>
-							window.open(track.external_urls.spotify, "_blank")
-						}
+						onClick={() => openPanel("track", item.track.id)}
 					/>
+				))}
+			</div>
+			{/* Grid view for medium+ screens */}
+			<div className="hidden grid-cols-3 gap-3 md:grid lg:grid-cols-4 xl:grid-cols-6">
+				{data.items.map((item, index) => (
+					<AnimatedCard
+						key={`${item.track.id}-${index}`}
+						index={index}
+						layoutId={`recent-${item.track.id}`}
+						onClick={() => {
+							performance.mark(`detail-open-${item.track.id}`);
+							openPanel("track", item.track.id);
+						}}
+						onPrefetch={() => prefetch(trackDetailQueryOptions(item.track.id))}
+						onCancelPrefetch={cancel}
+					>
+						<TrackCard track={item.track} />
+					</AnimatedCard>
 				))}
 			</div>
 		</section>

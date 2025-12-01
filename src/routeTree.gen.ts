@@ -15,6 +15,18 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSpotifyRouteImport } from './routes/auth/spotify'
 import { Route as AuthedDashboardRouteRouteImport } from './routes/_authed/dashboard.route'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard.index'
+import { Route as AuthedDashboardTopTracksRouteImport } from './routes/_authed/dashboard.top-tracks'
+import { Route as AuthedDashboardTopArtistsRouteImport } from './routes/_authed/dashboard.top-artists'
+import { Route as AuthedDashboardSearchRouteImport } from './routes/_authed/dashboard.search'
+import { Route as AuthedDashboardSavedAlbumsRouteImport } from './routes/_authed/dashboard.saved-albums'
+import { Route as AuthedDashboardRecentRouteImport } from './routes/_authed/dashboard.recent'
+import { Route as AuthedDashboardProfileRouteImport } from './routes/_authed/dashboard.profile'
+import { Route as AuthedDashboardLibraryRouteImport } from './routes/_authed/dashboard.library'
+import { Route as AuthedDashboardFavoritesRouteImport } from './routes/_authed/dashboard.favorites'
+import { Route as AuthedDashboardTrackIdRouteImport } from './routes/_authed/dashboard.track.$id'
+import { Route as AuthedDashboardPlaylistIdRouteImport } from './routes/_authed/dashboard.playlist.$id'
+import { Route as AuthedDashboardArtistIdRouteImport } from './routes/_authed/dashboard.artist.$id'
+import { Route as AuthedDashboardAlbumIdRouteImport } from './routes/_authed/dashboard.album.$id'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -45,19 +57,108 @@ const AuthedDashboardIndexRoute = AuthedDashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedDashboardRouteRoute,
 } as any)
+const AuthedDashboardTopTracksRoute =
+  AuthedDashboardTopTracksRouteImport.update({
+    id: '/top-tracks',
+    path: '/top-tracks',
+    getParentRoute: () => AuthedDashboardRouteRoute,
+  } as any)
+const AuthedDashboardTopArtistsRoute =
+  AuthedDashboardTopArtistsRouteImport.update({
+    id: '/top-artists',
+    path: '/top-artists',
+    getParentRoute: () => AuthedDashboardRouteRoute,
+  } as any)
+const AuthedDashboardSearchRoute = AuthedDashboardSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AuthedDashboardRouteRoute,
+} as any)
+const AuthedDashboardSavedAlbumsRoute =
+  AuthedDashboardSavedAlbumsRouteImport.update({
+    id: '/saved-albums',
+    path: '/saved-albums',
+    getParentRoute: () => AuthedDashboardRouteRoute,
+  } as any)
+const AuthedDashboardRecentRoute = AuthedDashboardRecentRouteImport.update({
+  id: '/recent',
+  path: '/recent',
+  getParentRoute: () => AuthedDashboardRouteRoute,
+} as any)
+const AuthedDashboardProfileRoute = AuthedDashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthedDashboardRouteRoute,
+} as any)
+const AuthedDashboardLibraryRoute = AuthedDashboardLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AuthedDashboardRouteRoute,
+} as any)
+const AuthedDashboardFavoritesRoute =
+  AuthedDashboardFavoritesRouteImport.update({
+    id: '/favorites',
+    path: '/favorites',
+    getParentRoute: () => AuthedDashboardRouteRoute,
+  } as any)
+const AuthedDashboardTrackIdRoute = AuthedDashboardTrackIdRouteImport.update({
+  id: '/track/$id',
+  path: '/track/$id',
+  getParentRoute: () => AuthedDashboardRouteRoute,
+} as any)
+const AuthedDashboardPlaylistIdRoute =
+  AuthedDashboardPlaylistIdRouteImport.update({
+    id: '/playlist/$id',
+    path: '/playlist/$id',
+    getParentRoute: () => AuthedDashboardRouteRoute,
+  } as any)
+const AuthedDashboardArtistIdRoute = AuthedDashboardArtistIdRouteImport.update({
+  id: '/artist/$id',
+  path: '/artist/$id',
+  getParentRoute: () => AuthedDashboardRouteRoute,
+} as any)
+const AuthedDashboardAlbumIdRoute = AuthedDashboardAlbumIdRouteImport.update({
+  id: '/album/$id',
+  path: '/album/$id',
+  getParentRoute: () => AuthedDashboardRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/logout': typeof LogoutRoute
   '/dashboard': typeof AuthedDashboardRouteRouteWithChildren
   '/auth/spotify': typeof AuthSpotifyRoute
+  '/dashboard/favorites': typeof AuthedDashboardFavoritesRoute
+  '/dashboard/library': typeof AuthedDashboardLibraryRoute
+  '/dashboard/profile': typeof AuthedDashboardProfileRoute
+  '/dashboard/recent': typeof AuthedDashboardRecentRoute
+  '/dashboard/saved-albums': typeof AuthedDashboardSavedAlbumsRoute
+  '/dashboard/search': typeof AuthedDashboardSearchRoute
+  '/dashboard/top-artists': typeof AuthedDashboardTopArtistsRoute
+  '/dashboard/top-tracks': typeof AuthedDashboardTopTracksRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
+  '/dashboard/album/$id': typeof AuthedDashboardAlbumIdRoute
+  '/dashboard/artist/$id': typeof AuthedDashboardArtistIdRoute
+  '/dashboard/playlist/$id': typeof AuthedDashboardPlaylistIdRoute
+  '/dashboard/track/$id': typeof AuthedDashboardTrackIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/logout': typeof LogoutRoute
   '/auth/spotify': typeof AuthSpotifyRoute
+  '/dashboard/favorites': typeof AuthedDashboardFavoritesRoute
+  '/dashboard/library': typeof AuthedDashboardLibraryRoute
+  '/dashboard/profile': typeof AuthedDashboardProfileRoute
+  '/dashboard/recent': typeof AuthedDashboardRecentRoute
+  '/dashboard/saved-albums': typeof AuthedDashboardSavedAlbumsRoute
+  '/dashboard/search': typeof AuthedDashboardSearchRoute
+  '/dashboard/top-artists': typeof AuthedDashboardTopArtistsRoute
+  '/dashboard/top-tracks': typeof AuthedDashboardTopTracksRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
+  '/dashboard/album/$id': typeof AuthedDashboardAlbumIdRoute
+  '/dashboard/artist/$id': typeof AuthedDashboardArtistIdRoute
+  '/dashboard/playlist/$id': typeof AuthedDashboardPlaylistIdRoute
+  '/dashboard/track/$id': typeof AuthedDashboardTrackIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,13 +167,58 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/_authed/dashboard': typeof AuthedDashboardRouteRouteWithChildren
   '/auth/spotify': typeof AuthSpotifyRoute
+  '/_authed/dashboard/favorites': typeof AuthedDashboardFavoritesRoute
+  '/_authed/dashboard/library': typeof AuthedDashboardLibraryRoute
+  '/_authed/dashboard/profile': typeof AuthedDashboardProfileRoute
+  '/_authed/dashboard/recent': typeof AuthedDashboardRecentRoute
+  '/_authed/dashboard/saved-albums': typeof AuthedDashboardSavedAlbumsRoute
+  '/_authed/dashboard/search': typeof AuthedDashboardSearchRoute
+  '/_authed/dashboard/top-artists': typeof AuthedDashboardTopArtistsRoute
+  '/_authed/dashboard/top-tracks': typeof AuthedDashboardTopTracksRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
+  '/_authed/dashboard/album/$id': typeof AuthedDashboardAlbumIdRoute
+  '/_authed/dashboard/artist/$id': typeof AuthedDashboardArtistIdRoute
+  '/_authed/dashboard/playlist/$id': typeof AuthedDashboardPlaylistIdRoute
+  '/_authed/dashboard/track/$id': typeof AuthedDashboardTrackIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/logout' | '/dashboard' | '/auth/spotify' | '/dashboard/'
+  fullPaths:
+    | '/'
+    | '/logout'
+    | '/dashboard'
+    | '/auth/spotify'
+    | '/dashboard/favorites'
+    | '/dashboard/library'
+    | '/dashboard/profile'
+    | '/dashboard/recent'
+    | '/dashboard/saved-albums'
+    | '/dashboard/search'
+    | '/dashboard/top-artists'
+    | '/dashboard/top-tracks'
+    | '/dashboard/'
+    | '/dashboard/album/$id'
+    | '/dashboard/artist/$id'
+    | '/dashboard/playlist/$id'
+    | '/dashboard/track/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/logout' | '/auth/spotify' | '/dashboard'
+  to:
+    | '/'
+    | '/logout'
+    | '/auth/spotify'
+    | '/dashboard/favorites'
+    | '/dashboard/library'
+    | '/dashboard/profile'
+    | '/dashboard/recent'
+    | '/dashboard/saved-albums'
+    | '/dashboard/search'
+    | '/dashboard/top-artists'
+    | '/dashboard/top-tracks'
+    | '/dashboard'
+    | '/dashboard/album/$id'
+    | '/dashboard/artist/$id'
+    | '/dashboard/playlist/$id'
+    | '/dashboard/track/$id'
   id:
     | '__root__'
     | '/'
@@ -80,7 +226,19 @@ export interface FileRouteTypes {
     | '/logout'
     | '/_authed/dashboard'
     | '/auth/spotify'
+    | '/_authed/dashboard/favorites'
+    | '/_authed/dashboard/library'
+    | '/_authed/dashboard/profile'
+    | '/_authed/dashboard/recent'
+    | '/_authed/dashboard/saved-albums'
+    | '/_authed/dashboard/search'
+    | '/_authed/dashboard/top-artists'
+    | '/_authed/dashboard/top-tracks'
     | '/_authed/dashboard/'
+    | '/_authed/dashboard/album/$id'
+    | '/_authed/dashboard/artist/$id'
+    | '/_authed/dashboard/playlist/$id'
+    | '/_authed/dashboard/track/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -134,15 +292,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardIndexRouteImport
       parentRoute: typeof AuthedDashboardRouteRoute
     }
+    '/_authed/dashboard/top-tracks': {
+      id: '/_authed/dashboard/top-tracks'
+      path: '/top-tracks'
+      fullPath: '/dashboard/top-tracks'
+      preLoaderRoute: typeof AuthedDashboardTopTracksRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/top-artists': {
+      id: '/_authed/dashboard/top-artists'
+      path: '/top-artists'
+      fullPath: '/dashboard/top-artists'
+      preLoaderRoute: typeof AuthedDashboardTopArtistsRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/search': {
+      id: '/_authed/dashboard/search'
+      path: '/search'
+      fullPath: '/dashboard/search'
+      preLoaderRoute: typeof AuthedDashboardSearchRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/saved-albums': {
+      id: '/_authed/dashboard/saved-albums'
+      path: '/saved-albums'
+      fullPath: '/dashboard/saved-albums'
+      preLoaderRoute: typeof AuthedDashboardSavedAlbumsRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/recent': {
+      id: '/_authed/dashboard/recent'
+      path: '/recent'
+      fullPath: '/dashboard/recent'
+      preLoaderRoute: typeof AuthedDashboardRecentRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/profile': {
+      id: '/_authed/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof AuthedDashboardProfileRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/library': {
+      id: '/_authed/dashboard/library'
+      path: '/library'
+      fullPath: '/dashboard/library'
+      preLoaderRoute: typeof AuthedDashboardLibraryRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/favorites': {
+      id: '/_authed/dashboard/favorites'
+      path: '/favorites'
+      fullPath: '/dashboard/favorites'
+      preLoaderRoute: typeof AuthedDashboardFavoritesRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/track/$id': {
+      id: '/_authed/dashboard/track/$id'
+      path: '/track/$id'
+      fullPath: '/dashboard/track/$id'
+      preLoaderRoute: typeof AuthedDashboardTrackIdRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/playlist/$id': {
+      id: '/_authed/dashboard/playlist/$id'
+      path: '/playlist/$id'
+      fullPath: '/dashboard/playlist/$id'
+      preLoaderRoute: typeof AuthedDashboardPlaylistIdRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/artist/$id': {
+      id: '/_authed/dashboard/artist/$id'
+      path: '/artist/$id'
+      fullPath: '/dashboard/artist/$id'
+      preLoaderRoute: typeof AuthedDashboardArtistIdRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
+    '/_authed/dashboard/album/$id': {
+      id: '/_authed/dashboard/album/$id'
+      path: '/album/$id'
+      fullPath: '/dashboard/album/$id'
+      preLoaderRoute: typeof AuthedDashboardAlbumIdRouteImport
+      parentRoute: typeof AuthedDashboardRouteRoute
+    }
   }
 }
 
 interface AuthedDashboardRouteRouteChildren {
+  AuthedDashboardFavoritesRoute: typeof AuthedDashboardFavoritesRoute
+  AuthedDashboardLibraryRoute: typeof AuthedDashboardLibraryRoute
+  AuthedDashboardProfileRoute: typeof AuthedDashboardProfileRoute
+  AuthedDashboardRecentRoute: typeof AuthedDashboardRecentRoute
+  AuthedDashboardSavedAlbumsRoute: typeof AuthedDashboardSavedAlbumsRoute
+  AuthedDashboardSearchRoute: typeof AuthedDashboardSearchRoute
+  AuthedDashboardTopArtistsRoute: typeof AuthedDashboardTopArtistsRoute
+  AuthedDashboardTopTracksRoute: typeof AuthedDashboardTopTracksRoute
   AuthedDashboardIndexRoute: typeof AuthedDashboardIndexRoute
+  AuthedDashboardAlbumIdRoute: typeof AuthedDashboardAlbumIdRoute
+  AuthedDashboardArtistIdRoute: typeof AuthedDashboardArtistIdRoute
+  AuthedDashboardPlaylistIdRoute: typeof AuthedDashboardPlaylistIdRoute
+  AuthedDashboardTrackIdRoute: typeof AuthedDashboardTrackIdRoute
 }
 
 const AuthedDashboardRouteRouteChildren: AuthedDashboardRouteRouteChildren = {
+  AuthedDashboardFavoritesRoute: AuthedDashboardFavoritesRoute,
+  AuthedDashboardLibraryRoute: AuthedDashboardLibraryRoute,
+  AuthedDashboardProfileRoute: AuthedDashboardProfileRoute,
+  AuthedDashboardRecentRoute: AuthedDashboardRecentRoute,
+  AuthedDashboardSavedAlbumsRoute: AuthedDashboardSavedAlbumsRoute,
+  AuthedDashboardSearchRoute: AuthedDashboardSearchRoute,
+  AuthedDashboardTopArtistsRoute: AuthedDashboardTopArtistsRoute,
+  AuthedDashboardTopTracksRoute: AuthedDashboardTopTracksRoute,
   AuthedDashboardIndexRoute: AuthedDashboardIndexRoute,
+  AuthedDashboardAlbumIdRoute: AuthedDashboardAlbumIdRoute,
+  AuthedDashboardArtistIdRoute: AuthedDashboardArtistIdRoute,
+  AuthedDashboardPlaylistIdRoute: AuthedDashboardPlaylistIdRoute,
+  AuthedDashboardTrackIdRoute: AuthedDashboardTrackIdRoute,
 }
 
 const AuthedDashboardRouteRouteWithChildren =

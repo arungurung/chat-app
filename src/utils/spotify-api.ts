@@ -1,9 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { tokenMiddleware } from "@/middlewares/token-middleware";
+import { authMiddleware } from "@/middlewares/authMiddleware";
 import type {
+	ArtistTopTracksResponse,
 	SpotifyAlbum,
 	SpotifyArtist,
 	SpotifyCategory,
+	SpotifyCurrentUserProfile,
 	SpotifyPaginatedResponse,
 	SpotifyPlaylist,
 	SpotifySavedItem,
@@ -25,6 +27,7 @@ export async function spotifyFetch<T>(
 		? endpoint
 		: `https://api.spotify.com/v1/${endpoint}`;
 
+	console.info(`[spotifyFetch] GET ${url}`);
 	const response = await fetch(url, {
 		...options,
 		headers: {
@@ -42,7 +45,10 @@ export async function spotifyFetch<T>(
 		} catch {
 			details = await response.text();
 		}
-		console.error(`Spotify API error (${response.status}):`, details);
+		console.error(
+			`[spotifyFetch] Error ${response.status} for ${url}:`,
+			details,
+		);
 		if (
 			response.status === 403 &&
 			(details || "").toLowerCase().includes("insufficient client scope")
@@ -65,7 +71,7 @@ export async function spotifyFetch<T>(
  * @param limit - Number of items to return (max 50)
  */
 export const getTopTracks = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator(
 		(input: { timeRange?: SpotifyTimeRange; limit?: number } = {}) => ({
 			timeRange: input.timeRange || "medium_term",
@@ -95,7 +101,7 @@ export const getTopTracks = createServerFn({ method: "GET" })
  * @param limit - Number of items to return (max 50)
  */
 export const getTopArtists = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator(
 		(input: { timeRange?: SpotifyTimeRange; limit?: number } = {}) => ({
 			timeRange: input.timeRange || "medium_term",
@@ -125,7 +131,7 @@ export const getTopArtists = createServerFn({ method: "GET" })
  * @param offset - Index of first item to return
  */
 export const getUserPlaylists = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator((input: { limit?: number; offset?: number } = {}) => ({
 		limit: Math.min(input.limit || 20, 50),
 		offset: input.offset || 0,
@@ -152,7 +158,7 @@ export const getUserPlaylists = createServerFn({ method: "GET" })
  * @param offset - Index of first item to return
  */
 export const getSavedAlbums = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator((input: { limit?: number; offset?: number } = {}) => ({
 		limit: Math.min(input.limit || 20, 50),
 		offset: input.offset || 0,
@@ -177,7 +183,7 @@ export const getSavedAlbums = createServerFn({ method: "GET" })
  * @param limit - Number of items to return (max 50)
  */
 export const getRecentlyPlayed = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator((input: { limit?: number } = {}) => ({
 		limit: Math.min(input.limit || 20, 50),
 	}))
@@ -219,7 +225,7 @@ export const getRecentlyPlayed = createServerFn({ method: "GET" })
  * @param limit - Number of results per type (max 50)
  */
 export const searchSpotify = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator(
 		(input: {
 			query: string;
@@ -292,7 +298,7 @@ export const searchSpotify = createServerFn({ method: "GET" })
  * @param offset - Index of first item to return
  */
 export const getBrowseCategories = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator((input: { limit?: number; offset?: number } = {}) => ({
 		limit: Math.min(input.limit || 20, 50),
 		offset: input.offset || 0,
@@ -323,7 +329,7 @@ export const getBrowseCategories = createServerFn({ method: "GET" })
  * @param limit - Number of items to return (max 50)
  */
 export const getCategoryPlaylists = createServerFn({ method: "GET" })
-	.middleware([tokenMiddleware])
+	.middleware([authMiddleware])
 	.inputValidator(
 		(input: { categoryId: string; limit?: number; offset?: number }) => ({
 			categoryId: input.categoryId,
@@ -349,4 +355,119 @@ export const getCategoryPlaylists = createServerFn({ method: "GET" })
 			`/browse/categories/${data.categoryId}/playlists?${params}`,
 			accessToken,
 		);
+	});
+
+// Detail endpoints for entity panel
+export const getTrackByIdFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<SpotifyTrack>(`/tracks/${data}`, accessToken);
+	});
+
+export const getArtistByIdFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<SpotifyArtist>(`/artists/${data}`, accessToken);
+	});
+
+export const getAlbumByIdFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<SpotifyAlbum>(`/albums/${data}`, accessToken);
+	});
+
+export const getPlaylistByIdFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<SpotifyPlaylist>(`/playlists/${data}`, accessToken);
+	});
+
+export const getPlaylistTracksFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.inputValidator((input: { id: string; limit?: number; offset?: number }) => ({
+		id: input.id,
+		limit: Math.min(input.limit ?? 10, 50),
+		offset: input.offset ?? 0,
+	}))
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		const params = new URLSearchParams({
+			limit: String(data.limit),
+			offset: String(data.offset),
+		});
+		return spotifyFetch<SpotifyPaginatedResponse<{ track: SpotifyTrack }>>(
+			`/playlists/${data.id}/tracks?${params}`,
+			accessToken,
+		);
+	});
+
+// Secondary data endpoints for enriched detail views
+
+export const getArtistTopTracksFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.inputValidator((id: string) => id)
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<ArtistTopTracksResponse>(
+			`/artists/${data}/top-tracks?market=US`,
+			accessToken,
+		);
+	});
+
+export const getArtistAlbumsFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.inputValidator((input: { id: string; limit?: number }) => ({
+		id: input.id,
+		limit: Math.min(input.limit ?? 10, 50),
+	}))
+	.handler(async ({ data, context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		const params = new URLSearchParams({
+			limit: String(data.limit),
+			include_groups: "album,single",
+		});
+		return spotifyFetch<SpotifyPaginatedResponse<SpotifyAlbum>>(
+			`/artists/${data.id}/albums?${params}`,
+			accessToken,
+		);
+	});
+
+// Current user profile
+export const getCurrentUserProfileFn = createServerFn({ method: "GET" })
+	.middleware([authMiddleware])
+	.handler(async ({ context }) => {
+		const accessToken = context.session.data.accessToken;
+		if (!accessToken) {
+			throw new Error("No access token available");
+		}
+		return spotifyFetch<SpotifyCurrentUserProfile>(`/me`, accessToken);
 	});

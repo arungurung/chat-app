@@ -30,6 +30,7 @@ export interface SpotifyAlbum {
 	images: SpotifyImage[];
 	release_date: string;
 	total_tracks: number;
+	tracks: SpotifyPaginatedResponse<SpotifyTrack>;
 	external_urls: {
 		spotify: string;
 	};
@@ -105,3 +106,40 @@ export interface SpotifySearchResponse {
 
 // Time range for top items
 export type SpotifyTimeRange = "short_term" | "medium_term" | "long_term";
+
+// Audio features for tracks
+export interface SpotifyAudioFeatures {
+	id: string;
+	danceability: number;
+	energy: number;
+	key: number;
+	loudness: number;
+	mode: number;
+	speechiness: number;
+	acousticness: number;
+	instrumentalness: number;
+	liveness: number;
+	valence: number;
+	tempo: number;
+	duration_ms: number;
+	time_signature: number;
+}
+
+// Artist top tracks response
+export interface ArtistTopTracksResponse {
+	tracks: SpotifyTrack[];
+}
+
+// Related artists response
+
+// Current user profile
+export interface SpotifyCurrentUserProfile {
+	id: string;
+	display_name: string | null;
+	email?: string;
+	images?: SpotifyImage[];
+	country?: string;
+	product?: "free" | "premium" | string; // free, premium, etc.
+	followers?: { total: number };
+	external_urls?: { spotify: string };
+}
