@@ -12,3 +12,5 @@ count.txt
 .vinxi
 todos.json
 *.prompt.md
+.vercel
+.env*.local
